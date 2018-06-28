@@ -175,19 +175,30 @@ export default class WorldMap {
     if (this.ctrl.panel.disableClickable) {
       circle.on('click', function onClick(evt) {
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', '/api/search?folderIds=0&query=&starred=false", true');
-        xhr.send();
-        xhr.onreadystatechange = processRequest;
-        function processRequest(e) {
+        xhr.open('GET', 'api/search?query=' + encodeURI(compare) + '&starred=false', true);
+        xhr.onreadystatechange = function () {
           if (xhr.readyState === 4) {
-            const response = JSON.parse(xhr.responseText);
-            for (let i = 0; i < response.length; i += 1) {
-              if (response[i].title === compare) {
-                window.location.replace(response[i].url);
+            if (xhr.status === 200) {
+              try {
+                let notfound = true;
+                const response = JSON.parse(xhr.responseText);
+                for (let i = 0; i < response.length; i += 1) {
+                  if (response[i].title === compare) {
+                    notfound = false;
+                    window.location.replace(response[i].url);
+                    break;
+                  }
+                }
+                if (notfound) console.log('No matching dashboard with name ' + compare);
+              } catch (error) {
+                console.log('Could not open dashboard link: ' + error.message);
               }
+            } else {
+              console.log('Could not find dashboard link: ' + xhr.status);
             }
           }
         }
+        xhr.send();
       });
     }
   }

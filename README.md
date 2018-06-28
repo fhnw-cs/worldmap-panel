@@ -279,7 +279,8 @@ The threshold field also accepts 2 or more comma-separated values. For example, 
 
 ### Clickable Labels
 
-If //Clickable// is enabled, the user can click on the pop-up labels to navigate to another dashboard.
+If *Clickable* is enabled, the user can click on the pop-up labels to navigate to another dashboard.
+The dashboard name must match the location name.
 
 ### CHANGELOG
 
