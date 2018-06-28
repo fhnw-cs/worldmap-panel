@@ -166,6 +166,8 @@ System.register(['lodash', './libs/leaflet'], function (_export, _context) {
                 });
                 circle.unbindPopup();
                 _this4.createPopup(circle, dataPoint.locationName, dataPoint.valueRounded);
+                // create link to dashboard if clickable
+                _this4.createDashboardLink(circle, dataPoint);
               }
             });
           }
@@ -181,6 +183,8 @@ System.register(['lodash', './libs/leaflet'], function (_export, _context) {
             });
 
             this.createPopup(circle, dataPoint.locationName, dataPoint.valueRounded);
+            // create link to dashboard if clickable
+            this.createDashboardLink(circle, dataPoint);
             return circle;
           }
         }, {
@@ -202,8 +206,8 @@ System.register(['lodash', './libs/leaflet'], function (_export, _context) {
           key: 'createPopup',
           value: function createPopup(circle, locationName, value) {
             var unit = value && value === 1 ? this.ctrl.panel.unitSingular : this.ctrl.panel.unitPlural;
-            var label = (locationName + ': ' + value + ' ' + (unit || '')).trim();
-            circle.bindPopup(label, { 'offset': window.L.point(0, -2), 'className': 'worldmap-popup', 'closeButton': this.ctrl.panel.stickyLabels });
+            var label = locationName.trim();
+            circle.bindPopup(label, { 'offset': window.L.point(0, -20), 'className': 'worldmap-popup', 'closeButton': this.ctrl.panel.stickyLabels });
 
             circle.on('mouseover', function onMouseOver(evt) {
               var layer = evt.target;
@@ -214,6 +218,30 @@ System.register(['lodash', './libs/leaflet'], function (_export, _context) {
             if (!this.ctrl.panel.stickyLabels) {
               circle.on('mouseout', function onMouseOut() {
                 circle.closePopup();
+              });
+            }
+          }
+        }, {
+          key: 'createDashboardLink',
+          value: function createDashboardLink(circle, dataPoint) {
+            // const compare2 = this.ctrl.panel.clickWhere;
+            var compare = dataPoint.locationName;
+            if (this.ctrl.panel.disableClickable) {
+              circle.on('click', function onClick(evt) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', '/api/search?folderIds=0&query=&starred=false", true');
+                xhr.send();
+                xhr.onreadystatechange = processRequest;
+                function processRequest(e) {
+                  if (xhr.readyState === 4) {
+                    var response = JSON.parse(xhr.responseText);
+                    for (var i = 0; i < response.length; i += 1) {
+                      if (response[i].title === compare) {
+                        window.location.replace(response[i].url);
+                      }
+                    }
+                  }
+                }
               });
             }
           }

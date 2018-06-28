@@ -27,6 +27,8 @@ const panelDefaults = {
   esMetric: 'Count',
   decimals: 0,
   hideEmpty: false,
+  disableClickable: false,
+  clickWhere: 'Location',
   hideZero: false,
   stickyLabels: false,
   tableQueryOptions: {

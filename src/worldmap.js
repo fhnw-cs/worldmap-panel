@@ -115,6 +115,8 @@ export default class WorldMap {
         });
         circle.unbindPopup();
         this.createPopup(circle, dataPoint.locationName, dataPoint.valueRounded);
+        // create link to dashboard if clickable
+        this.createDashboardLink(circle, dataPoint);
       }
     });
   }
@@ -129,6 +131,8 @@ export default class WorldMap {
     });
 
     this.createPopup(circle, dataPoint.locationName, dataPoint.valueRounded);
+    // create link to dashboard if clickable
+    this.createDashboardLink(circle, dataPoint);
     return circle;
   }
 
@@ -148,8 +152,8 @@ export default class WorldMap {
 
   createPopup(circle, locationName, value) {
     const unit = value && value === 1 ? this.ctrl.panel.unitSingular : this.ctrl.panel.unitPlural;
-    const label = (locationName + ': ' + value + ' ' + (unit || '')).trim();
-    circle.bindPopup(label, {'offset': window.L.point(0, -2), 'className': 'worldmap-popup', 'closeButton': this.ctrl.panel.stickyLabels});
+    const label = (locationName).trim();
+    circle.bindPopup(label, {'offset': window.L.point(0, -20), 'className': 'worldmap-popup', 'closeButton': this.ctrl.panel.stickyLabels});
 
     circle.on('mouseover', function onMouseOver(evt) {
       const layer = evt.target;
@@ -160,6 +164,30 @@ export default class WorldMap {
     if (!this.ctrl.panel.stickyLabels) {
       circle.on('mouseout', function onMouseOut() {
         circle.closePopup();
+      });
+    }
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  createDashboardLink(circle, dataPoint) {
+    // const compare2 = this.ctrl.panel.clickWhere;
+    const compare = dataPoint.locationName;
+    if (this.ctrl.panel.disableClickable) {
+      circle.on('click', function onClick(evt) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', '/api/search?folderIds=0&query=&starred=false", true');
+        xhr.send();
+        xhr.onreadystatechange = processRequest;
+        function processRequest(e) {
+          if (xhr.readyState === 4) {
+            const response = JSON.parse(xhr.responseText);
+            for (let i = 0; i < response.length; i += 1) {
+              if (response[i].title === compare) {
+                window.location.replace(response[i].url);
+              }
+            }
+          }
+        }
       });
     }
   }

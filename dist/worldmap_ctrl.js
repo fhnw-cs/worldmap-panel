@@ -87,6 +87,8 @@ System.register(['app/plugins/sdk', 'app/core/time_series2', 'app/core/utils/kbn
         esMetric: 'Count',
         decimals: 0,
         hideEmpty: false,
+        disableClickable: false,
+        clickWhere: 'Location',
         hideZero: false,
         stickyLabels: false,
         tableQueryOptions: {
